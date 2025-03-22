@@ -40,7 +40,9 @@ uses
   usuario.session in 'session\usuario.session.pas',
   itarefa.repository in 'domain\itarefa.repository.pas',
   Horse.CORS in 'Horse-CORS\Horse.CORS.pas',
-  iusuario.repository in 'domain\iusuario.repository.pas';
+  iusuario.repository in 'domain\iusuario.repository.pas',
+  usuario.dto in 'domain\usuario.dto.pas',
+  tarefa.dto in 'domain\tarefa.dto.pas';
 
 var Params: TStrings;
 

@@ -3,7 +3,7 @@ unit usuario.controller;
 interface
 
 uses  Horse, Horse.Session, usuario.service, usuario, usuario.session, IUsuario.Repository, usuario.repository,
-      System.SysUtils, System.JSON;
+      usuario.dto, System.SysUtils, System.JSON;
 
 procedure Login(Req: THorseRequest; Res: THorseResponse);
 procedure Cadastrar(Req: THorseRequest; Res: THorseResponse);
@@ -68,27 +68,38 @@ begin
   end;
 end;
 
-
 procedure Cadastrar(Req: THorseRequest; Res: THorseResponse);
 var
+  UsuarioRequest: TUsuarioRequestDTO;
   Usuario: TUsuario;
   UsuarioService: TUsuarioService;
   UsuarioRepository: IUsuarioRepository;
 begin
-  Usuario := TUsuario.Create;
+  UsuarioRequest := TUsuarioRequestDTO.Create;
   try
-    Usuario.Nome := Req.Body<TJSONObject>.GetValue<string>('nome');
-    Usuario.Email := Req.Body<TJSONObject>.GetValue<string>('email');
-    Usuario.Senha := Req.Body<TJSONObject>.GetValue<string>('senha');
+    // Converte o JSON recebido em um DTO
+    UsuarioRequest.Nome := Req.Body<TJSONObject>.GetValue<string>('nome');
+    UsuarioRequest.Email := Req.Body<TJSONObject>.GetValue<string>('email');
+    UsuarioRequest.Senha := Req.Body<TJSONObject>.GetValue<string>('senha');
 
-    UsuarioRepository := TUsuarioRepository.Create;
-    UsuarioService := TUsuarioService.Create(UsuarioRepository);
+    // Converte o DTO em uma entidade de domínio
+    Usuario := TUsuario.Create;
+    try
+      Usuario.Nome := UsuarioRequest.Nome;
+      Usuario.Email := UsuarioRequest.Email;
+      Usuario.Senha := UsuarioRequest.Senha;
 
-    UsuarioService.Cadastrar(Usuario);
+      UsuarioRepository := TUsuarioRepository.Create;
+      UsuarioService := TUsuarioService.Create(UsuarioRepository);
 
-    Res.Status(201).Send('Usuário cadastrado com sucesso');
+      UsuarioService.Cadastrar(Usuario);
+
+      Res.Status(201).Send('Usuário cadastrado com sucesso');
+    finally
+      Usuario.Free;
+    end;
   finally
-    Usuario.Free;
+    UsuarioRequest.Free;
   end;
 end;
 

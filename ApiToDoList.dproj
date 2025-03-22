@@ -92,6 +92,8 @@
         <DCCReference Include="domain\itarefa.repository.pas"/>
         <DCCReference Include="Horse-CORS\Horse.CORS.pas"/>
         <DCCReference Include="domain\iusuario.repository.pas"/>
+        <DCCReference Include="domain\usuario.dto.pas"/>
+        <DCCReference Include="domain\tarefa.dto.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

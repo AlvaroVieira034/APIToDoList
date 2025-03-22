@@ -2,8 +2,8 @@ unit tarefa.controller;
 
 interface
 
-uses Horse, usuario, usuario.service, usuario.repository, usuario.session, iusuario.repository, tarefa, tarefa.service, itarefa.repository, tarefa.repository,
-     System.JSON, System.SysUtils;
+uses Horse, usuario, usuario.service, usuario.repository, usuario.session, iusuario.repository, tarefa, tarefa.service, itarefa.repository,
+     tarefa.repository, tarefa.dto, System.JSON, System.SysUtils;
 
 procedure ListarTarefas(Req: THorseRequest; Res: THorseResponse);
 procedure CriarTarefa(Req: THorseRequest; Res: THorseResponse);
@@ -70,22 +70,34 @@ end;
 
 procedure CriarTarefa(Req: THorseRequest; Res: THorseResponse);
 var
+  TarefaRequest: TTarefaRequestDTO;
   Tarefa: TTarefa;
   TarefaService: TTarefaService;
   TarefaRepository: ITarefaRepository;
 begin
-  Tarefa := TTarefa.Create;
+  TarefaRequest := TTarefaRequestDTO.Create;
   try
-    Tarefa.UsuarioId := Req.Session<TUsuarioSession>.UsuarioId;
-    Tarefa.Descricao := Req.Body<TJSONObject>.GetValue<string>('descricao');
+    // Converte o JSON recebido em um DTO
+    TarefaRequest.Descricao := Req.Body<TJSONObject>.GetValue<string>('descricao');
+    TarefaRequest.Concluida := Req.Body<TJSONObject>.GetValue<Boolean>('concluida');
 
-    TarefaRepository := TTarefaRepository.Create;
-    TarefaService := TTarefaService.Create(TarefaRepository);
+    // Converte o DTO em uma entidade de domínio
+    Tarefa := TTarefa.Create;
+    try
+      Tarefa.Descricao := TarefaRequest.Descricao;
+      Tarefa.Concluida := TarefaRequest.Concluida;
 
-    TarefaService.Criar(Tarefa);
-    Res.Status(201).Send('Tarefa criada com sucesso');
+      TarefaRepository := TTarefaRepository.Create;
+      TarefaService := TTarefaService.Create(TarefaRepository);
+
+      TarefaService.Criar(Tarefa);
+
+      Res.Status(201).Send('Tarefa criada com sucesso');
+    finally
+      Tarefa.Free;
+    end;
   finally
-    Tarefa.Free;
+    TarefaRequest.Free;
   end;
 end;
 
