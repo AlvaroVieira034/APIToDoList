@@ -13,55 +13,34 @@ procedure ExcluirTarefa(Req: THorseRequest; Res: THorseResponse);
 implementation
 
 procedure ListarTarefas(Req: THorseRequest; Res: THorseResponse);
-var Usuario: TUsuario;
-    UsuarioSession: TUsuarioSession;
-    JSON: TJSONObject;
-    Email, Senha: string;
-    TarefaService: TTarefaService;
-    TarefaRepository: ITarefaRepository;
-    UsuarioService: TUsuarioService;
-    UsuarioRepository: IUsuarioRepository;
+var
+  TarefaService: TTarefaService;
+  TarefaRepository: ITarefaRepository;
+  Tarefas: TArray<TTarefa>;
+  JSONArray: TJSONArray;
+  Tarefa: TTarefa;
 begin
   try
-    if not Req.Body<TJSONObject>.TryGetValue<string>('email', Email) then
+    // Ignora autenticação e define usuário ID 1
+    TarefaRepository := TTarefaRepository.Create;
+    TarefaService := TTarefaService.Create(TarefaRepository);
+
+    // Busca tarefas do usuário 1
+    Tarefas := TarefaService.ListarPorUsuarioId(1);
+
+    // Converte para JSON
+    JSONArray := TJSONArray.Create;
+    for Tarefa in Tarefas do
     begin
-      Res.Status(400).Send('Campo "email" não encontrado');
-      Exit;
+      JSONArray.AddElement(
+        TJSONObject.Create
+          .AddPair('id', TJSONNumber.Create(Tarefa.Id))
+          .AddPair('descricao', TJSONString.Create(Tarefa.Descricao))
+          .AddPair('concluida', TJSONBool.Create(Tarefa.Concluida))
+      );
     end;
 
-    if not Req.Body<TJSONObject>.TryGetValue<string>('senha', Senha) then
-    begin
-      Res.Status(400).Send('Campo "senha" não encontrado');
-      Exit;
-    end;
-
-    // Cria o repositório e o serviço de usuário
-    UsuarioRepository := TUsuarioRepository.Create;
-    UsuarioService := TUsuarioService.Create(UsuarioRepository);
-
-    // Chama o método de instância Login
-    Usuario := UsuarioService.Login(Email, Senha);
-
-    if Usuario <> nil then
-    begin
-      UsuarioSession := Req.Session<TUsuarioSession>;
-      UsuarioSession.UsuarioId := Usuario.Id;
-
-      // Cria o repositório e o serviço de tarefa
-      TarefaRepository := TTarefaRepository.Create;
-      TarefaService := TTarefaService.Create(TarefaRepository);
-
-      JSON := TJSONObject.Create;
-      try
-        JSON.AddPair('id', TJSONNumber.Create(Usuario.Id));
-        JSON.AddPair('nome', TJSONString.Create(Usuario.Nome));
-        Res.Send(JSON);
-      finally
-        JSON.Free;
-      end;
-    end
-    else
-      Res.Status(401).Send('Login falhou');
+    Res.Send(JSONArray);
   except
     on E: Exception do
       Res.Status(500).Send('Erro interno: ' + E.Message);
@@ -77,21 +56,14 @@ var
 begin
   TarefaRequest := TTarefaRequestDTO.Create;
   try
-    // Converte o JSON recebido em um DTO
     TarefaRequest.Descricao := Req.Body<TJSONObject>.GetValue<string>('descricao');
-    TarefaRequest.Concluida := Req.Body<TJSONObject>.GetValue<Boolean>('concluida');
-
-    // Converte o DTO em uma entidade de domínio
     Tarefa := TTarefa.Create;
     try
       Tarefa.Descricao := TarefaRequest.Descricao;
-      Tarefa.Concluida := TarefaRequest.Concluida;
-
+      Tarefa.UsuarioId := 2; // Define manualmente o usuário ID 1
       TarefaRepository := TTarefaRepository.Create;
       TarefaService := TTarefaService.Create(TarefaRepository);
-
       TarefaService.Criar(Tarefa);
-
       Res.Status(201).Send('Tarefa criada com sucesso');
     finally
       Tarefa.Free;
