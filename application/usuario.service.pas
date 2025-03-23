@@ -14,6 +14,7 @@ type
     constructor Create(AUsuarioRepository: IUsuarioRepository); // Construtor com injeção de dependência
     function Login(const AEmail, ASenha: string): TUsuario; // Método de instância
     procedure Cadastrar(const AUsuario: TUsuario);
+    function ListarTodos: TArray<TUsuario>;
 
   end;
 
@@ -23,6 +24,11 @@ constructor TUsuarioService.Create(AUsuarioRepository: IUsuarioRepository);
 begin
   inherited Create;
   FUsuarioRepository := AUsuarioRepository;
+end;
+
+function TUsuarioService.ListarTodos: TArray<TUsuario>;
+begin
+  Result := FUsuarioRepository.BuscarTodos;
 end;
 
 function TUsuarioService.Login(const AEmail, ASenha: string): TUsuario;

@@ -68,6 +68,7 @@ begin
       // Rotas de usuário
       THorse.Post('/login', Usuario.Controller.Login);
       THorse.Post('/cadastro', Usuario.Controller.Cadastrar);
+      THorse.Get('/usuarios', Usuario.Controller.ListarUsuarios);
 
       // Rotas de tarefas
       THorse.Get('/tarefas', Tarefa.Controller.ListarTarefas);

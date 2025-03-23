@@ -7,6 +7,7 @@ uses  Horse, Horse.Session, usuario.service, usuario, usuario.session, IUsuario.
 
 procedure Login(Req: THorseRequest; Res: THorseResponse);
 procedure Cadastrar(Req: THorseRequest; Res: THorseResponse);
+procedure ListarUsuarios(Req: THorseRequest; Res: THorseResponse);
 procedure ConfigurarCORS(Req: THorseRequest; Res: THorseResponse);
 
 implementation
@@ -100,6 +101,38 @@ begin
     end;
   finally
     UsuarioRequest.Free;
+  end;
+end;
+
+procedure ListarUsuarios(Req: THorseRequest; Res: THorseResponse);
+var
+  UsuarioService: TUsuarioService;
+  UsuarioRepository: IUsuarioRepository;
+  Usuarios: TArray<TUsuario>;
+  JSONArray: TJSONArray;
+  Usuario: TUsuario;
+begin
+  try
+    UsuarioRepository := TUsuarioRepository.Create;
+    UsuarioService := TUsuarioService.Create(UsuarioRepository);
+
+    Usuarios := UsuarioService.ListarTodos;
+
+    JSONArray := TJSONArray.Create;
+    for Usuario in Usuarios do
+    begin
+      JSONArray.AddElement(
+        TJSONObject.Create
+          .AddPair('id', TJSONNumber.Create(Usuario.Id))
+          .AddPair('nome', TJSONString.Create(Usuario.Nome))
+          .AddPair('email', TJSONString.Create(Usuario.Email))
+      );
+    end;
+
+    Res.Send(JSONArray);
+  except
+    on E: Exception do
+      Res.Status(500).Send('Erro interno: ' + E.Message);
   end;
 end;
 

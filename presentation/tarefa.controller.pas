@@ -60,7 +60,7 @@ begin
     Tarefa := TTarefa.Create;
     try
       Tarefa.Descricao := TarefaRequest.Descricao;
-      Tarefa.UsuarioId := 2; // Define manualmente o usuário ID 1
+      Tarefa.UsuarioId := 1; // Define manualmente o usuário ID 1
       TarefaRepository := TTarefaRepository.Create;
       TarefaService := TTarefaService.Create(TarefaRepository);
       TarefaService.Criar(Tarefa);

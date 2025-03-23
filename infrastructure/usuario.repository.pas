@@ -8,6 +8,7 @@ type
   TUsuarioRepository = class(TInterfacedObject, IUsuarioRepository)
   public
     function BuscarPorEmail(const AEmail: string): TUsuario;
+    function BuscarTodos: TArray<TUsuario>;
     procedure Salvar(const AUsuario: TUsuario);
 
   end;
@@ -39,6 +40,42 @@ begin
       end
       else
         Result := nil;
+    finally
+      Query.Free;
+    end;
+  finally
+    Conn.Free;
+  end;
+end;
+
+function TUsuarioRepository.BuscarTodos: TArray<TUsuario>;
+var
+  Conn: TFDConnection;
+  Query: TFDQuery;
+  Usuarios: TArray<TUsuario>;
+  I: Integer;
+begin
+  Conn := TDatabaseConfig.GetConnection;
+  try
+    Query := TFDQuery.Create(nil);
+    try
+      Query.Connection := Conn;
+      Query.SQL.Text := 'SELECT * FROM usuarios';
+      Query.Open;
+
+      SetLength(Usuarios, Query.RecordCount);
+      I := 0;
+      while not Query.Eof do
+      begin
+        Usuarios[I] := TUsuario.Create;
+        Usuarios[I].Id := Query.FieldByName('id').AsInteger;
+        Usuarios[I].Nome := Query.FieldByName('nome').AsString;
+        Usuarios[I].Email := Query.FieldByName('email').AsString;
+        Usuarios[I].Senha := Query.FieldByName('senha').AsString;
+        Query.Next;
+        Inc(I);
+      end;
+      Result := Usuarios;
     finally
       Query.Free;
     end;
