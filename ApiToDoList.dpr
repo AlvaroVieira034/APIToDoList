@@ -50,14 +50,15 @@ begin
   try
     Params := TStringList.Create;
     try
+      Writeln('API para controle de tarefas - Versão: 1.0.1 ');
       Writeln('Versão do Horse: ', THorse.Version);
-      Params.Add('Database=bancoteste.db');
-      THorse.Use(CORS);
 
       // Configura o FireDac para usar o Driver do SQLite
+      Params.Add('Database=bancoteste.db');
       FDManager.AddConnectionDef('SQLiteConnection', 'SQLite', Params);
 
       // Configura o middleware de sessão
+      THorse.Use(CORS);
       //THorse.Use(Session);
 
       // Configura a API
