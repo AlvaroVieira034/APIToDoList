@@ -51,9 +51,7 @@ begin
     Params := TStringList.Create;
     try
       Writeln('Versão do Horse: ', THorse.Version);
-
       Params.Add('Database=bancoteste.db');
-
       THorse.Use(CORS);
 
       // Configura o FireDac para usar o Driver do SQLite
