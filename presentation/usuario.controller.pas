@@ -15,7 +15,6 @@ implementation
 procedure Login(Req: THorseRequest; Res: THorseResponse);
 var
   Usuario: TUsuario;
-  UsuarioSession: TUsuarioSession;
   JSON: TJSONObject;
   Email, Senha: string;
   UsuarioService: TUsuarioService;
@@ -34,35 +33,24 @@ begin
       Exit;
     end;
 
-    // Cria o repositório e o serviço
     UsuarioRepository := TUsuarioRepository.Create;
     UsuarioService := TUsuarioService.Create(UsuarioRepository);
 
-    // Chama o método de instância Login
     Usuario := UsuarioService.Login(Email, Senha);
 
     if Usuario <> nil then
     begin
-      UsuarioSession := Req.Session<TUsuarioSession>;
-      if UsuarioSession = nil then
-      begin
-        Res.Status(500).Send('Erro ao criar sessão');
-        Exit;
-      end;
-
-      UsuarioSession.UsuarioId := Usuario.Id;
-
       JSON := TJSONObject.Create;
-      try
-        JSON.AddPair('id', TJSONNumber.Create(Usuario.Id));
-        JSON.AddPair('nome', TJSONString.Create(Usuario.Nome));
-        Res.Send(JSON);
-      finally
-        JSON.Free;
-      end;
+      JSON.AddPair('id', TJSONNumber.Create(Usuario.Id));
+      JSON.AddPair('nome', TJSONString.Create(Usuario.Nome));
+      JSON.AddPair('message', TJSONString.Create('Login efetuado com sucesso!'));
+
+      // Retorna a resposta e NÃO libera o JSON manualmente
+      Res.Send(JSON);
     end
     else
       Res.Status(401).Send('Login falhou');
+
   except
     on E: Exception do
       Res.Status(500).Send('Erro interno: ' + E.Message);

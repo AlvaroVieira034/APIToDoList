@@ -9,12 +9,31 @@ function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validação hardcoded
-    if (email === 'amvalvaro@hotmail.com.br' && senha === '123456') {
-      alert('Login realizado com sucesso!');
-      navigate('/tarefas'); // Redireciona para a página de tarefas
-    } else {
-      alert('Usuário/senha não encontrado');
+    try {
+      const response = await fetch('http://localhost:9000/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, senha }),
+      });
+
+      console.log('Status da resposta:', response.status);
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Dados recebidos:', data);
+        alert('Login realizado com sucesso!');
+        navigate('/tarefas'); // Redireciona para a página de tarefas
+      } else {
+        // Tenta ler a resposta para mais detalhes
+        const errorMsg = await response.text();
+        console.error('Erro na requisição:', errorMsg);
+        alert('Usuário/senha não encontrado');
+      }
+    } catch (error) {
+      console.error('Erro ao fazer login:', error);
+      alert('Erro ao fazer login. Tente novamente.');
     }
   };
 
