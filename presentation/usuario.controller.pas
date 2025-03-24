@@ -3,7 +3,7 @@ unit usuario.controller;
 interface
 
 uses  Horse, Horse.Session, usuario.service, usuario, usuario.session, IUsuario.Repository, usuario.repository,
-      usuario.dto, System.SysUtils, System.JSON;
+      usuario.dto, global, System.SysUtils, System.JSON;
 
 procedure Login(Req: THorseRequest; Res: THorseResponse);
 procedure Cadastrar(Req: THorseRequest; Res: THorseResponse);
@@ -44,6 +44,8 @@ begin
       JSON.AddPair('id', TJSONNumber.Create(Usuario.Id));
       JSON.AddPair('nome', TJSONString.Create(Usuario.Nome));
       JSON.AddPair('message', TJSONString.Create('Login efetuado com sucesso!'));
+
+      UsuarioLogado := Usuario.Id;
 
       // Retorna a resposta e NÃO libera o JSON manualmente
       Res.Send(JSON);

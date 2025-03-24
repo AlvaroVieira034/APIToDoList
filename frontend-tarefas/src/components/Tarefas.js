@@ -56,7 +56,7 @@ function Tarefas() {
 
   const handleConcluirTarefa = async (id) => {
     try {
-      const response = await fetch(`http://localhost:9000/tarefas/${id}/concluir`, {
+      const response = await fetch(`http://localhost:9000/tarefas/${id}`, {
         method: 'PUT',
       });
 

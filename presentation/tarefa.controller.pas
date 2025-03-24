@@ -3,7 +3,7 @@ unit tarefa.controller;
 interface
 
 uses Horse, usuario, usuario.service, usuario.repository, usuario.session, iusuario.repository, tarefa, tarefa.service, itarefa.repository,
-     tarefa.repository, tarefa.dto, System.JSON, System.SysUtils;
+     tarefa.repository, tarefa.dto, global, System.JSON, System.SysUtils;
 
 procedure ListarTarefas(Req: THorseRequest; Res: THorseResponse);
 procedure CriarTarefa(Req: THorseRequest; Res: THorseResponse);
@@ -21,12 +21,12 @@ var
   Tarefa: TTarefa;
 begin
   try
-    // Ignora autenticação e define usuário ID 1
     TarefaRepository := TTarefaRepository.Create;
     TarefaService := TTarefaService.Create(TarefaRepository);
 
-    // Busca tarefas do usuário 1
-    Tarefas := TarefaService.ListarPorUsuarioId(1);
+    // Busca tarefas do usuário logado
+    Tarefas := TarefaService.ListarPorUsuarioId(UsuarioLogado);
+    //Tarefas := TarefaService.ListarPorUsuarioId(Tarefa.UsuarioId);
 
     // Converte para JSON
     JSONArray := TJSONArray.Create;
@@ -60,7 +60,7 @@ begin
     Tarefa := TTarefa.Create;
     try
       Tarefa.Descricao := TarefaRequest.Descricao;
-      Tarefa.UsuarioId := 1; // Define manualmente o usuário ID 1
+      Tarefa.UsuarioId := TarefaRequest.UsuarioId;
       TarefaRepository := TTarefaRepository.Create;
       TarefaService := TTarefaService.Create(TarefaRepository);
       TarefaService.Criar(Tarefa);

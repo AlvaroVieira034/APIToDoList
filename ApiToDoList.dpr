@@ -42,7 +42,8 @@ uses
   Horse.CORS in 'Horse-CORS\Horse.CORS.pas',
   iusuario.repository in 'domain\iusuario.repository.pas',
   usuario.dto in 'domain\usuario.dto.pas',
-  tarefa.dto in 'domain\tarefa.dto.pas';
+  tarefa.dto in 'domain\tarefa.dto.pas',
+  global in 'session\global.pas';
 
 var Params: TStrings;
 
@@ -56,25 +57,30 @@ begin
       // Configura o FireDac para usar o Driver do SQLite
       Params.Add('Database=bancoteste.db');
       FDManager.AddConnectionDef('SQLiteConnection', 'SQLite', Params);
+      Writeln('Configuração do Banco de dados OK!');
 
       // Configura o middleware de sessão
-      THorse.Use(CORS);
       //THorse.Use(Session);
 
       // Configura a API
+      THorse.Use(CORS);
       THorse.Use(Jhonson()); // Middleware para JSON
+      Writeln('Configuração da API OK!');
 
+      Writeln('Configuração de rotas de usuário OK!');
       // Rotas de usuário
       THorse.Post('/login', Usuario.Controller.Login);
       THorse.Post('/cadastro', Usuario.Controller.Cadastrar);
       THorse.Get('/usuarios', Usuario.Controller.ListarUsuarios);
 
+      Writeln('Configuração de rotas de tarefas OK!');
       // Rotas de tarefas
       THorse.Get('/tarefas', Tarefa.Controller.ListarTarefas);
       THorse.Post('/tarefas', Tarefa.Controller.CriarTarefa);
       THorse.Put('/tarefas/:id', Tarefa.Controller.ConcluirTarefa);
       THorse.Delete('/tarefas/:id', Tarefa.Controller.ExcluirTarefa);
 
+      Writeln('Servidor Iniciado!!!');
       // Inicia o servidor na porta 9000
       THorse.Listen(9000);
     finally
