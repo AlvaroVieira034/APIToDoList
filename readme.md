@@ -28,6 +28,7 @@ O projeto foi desenvolvido seguindo boas práticas de programação, como **Clea
 
 Além do Delphi caso deseje ver os codigos fontes do projeto, deverá ter o horse, o react e o SQLite ao banco de dados da aplicação. Junto com o projeto está sendo enviado o banco de dados (bancoteste.db) que deve ficar junto com servidor da aplicação (APIToDoList.exe) também enviado no projeto. Para acessar as pagina web principal do projeto, digitar no seu navagador localhost:3000. 
 O servidor de aplicação do react deve estar rodando, bem com a api do projeto.
+Para logar no sistema, usar o email amvalvaro@hotmail.com com a senha 123456.
 
 # Arquitetura
 
